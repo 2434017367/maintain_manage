@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <#include "/header.html">
+
+    <style>
+        .box{
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+        .line{
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-form box" id="app">
+
+    <!--<div class="line">-->
+        <!--<span style="width: 80px">用户名：{{user.name}}</span>-->
+    <!--</div>-->
+
+    <div class="line">
+        <span style="width: 80px">姓名：</span>
+        <input type="text" :value="user.name" name="name" class="layui-input" lay-verify="required" lay-reqText="姓名不能为空">
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">性别：</span>
+        <div>
+            <template v-if="user.sex == 0">
+                <input type="radio" name="sex" value="1" title="男" >
+                <input type="radio" name="sex" value="0" title="女" checked>
+            </template>
+            <template v-else>
+                <input type="radio" name="sex" value="1" title="男" checked>
+                <input type="radio" name="sex" value="0" title="女" >
+            </template>
+
+        </div>
+
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">电话：</span>
+        <input type="text" :value="user.phone" name="phone" class="layui-input" lay-verify="required|phone" lay-reqText="电话不能为空">
+    </div>
+
+    <!--<div class="line">-->
+        <!--<span style="width: 80px">邮箱：</span>-->
+        <!--<input type="text" :value="user.email" name="email" class="layui-input" lay-verify="required|email" lay-reqText="邮箱不能为空">-->
+    <!--</div>-->
+
+    <div class="line">
+        <span style="width: 80px">地址：</span>
+        <input type="text" :value="user.address" name="address" class="layui-input">
+    </div>
+
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="confirm" id="confirm" value="确认">
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#app",
+        data:{
+            user:{
+
+            }
+        },
+        created(){
+            $.get("../api/user/getLoginUserInfo",function (r) {
+                console.log(r)
+                if(r.code === 0){
+
+                    vue.user = r.data;
+                }
+            })
+        },
+        mounted() {
+            layui.use(['form'], function () {
+                var form = layui.form;
+
+                form.on('submit(confirm)', function (data) {
+                    var field = data.field;
+                    field["id"] = vue.user.id;
+                    $.post("../api/user/updateInfo", field, function (r) {
+                        if(r.code === 0){
+                            parent.getInfo();
+                            
+                            layer.msg("修改成功", {icon:1,time: 500}, function () {
+                                // 关闭当前窗体
+                                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                parent.layer.close(index); //再执行关闭
+                            });
+                        }else{
+                            layer.msg(r.msg, {icon:2,time: 500});
+                        }
+                    })
+                })
+            })
+        },
+
+        methods: {
+        }
+    })
+
+</script>
+
+</body>
+</html>

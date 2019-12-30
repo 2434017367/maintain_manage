@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单搜索</title>
+
+    <link rel="stylesheet" type="text/css" href="layui/css/layui.css">
+
+    <script src="layui/layui.js"></script>
+    <script src="js/common.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.7/vue.min.js"></script>
+</head>
+<body>
+
+<div style="display: flex; flex-direction: column; align-items: center">
+    <div style="display: flex; flex-direction: row; justify-content: space-between; width: 96%; margin-top: 10px" class="layui-form">
+        <input type="text" class="layui-input" style="width: 50%" placeholder="请输入订单号" name="orderNumber">
+        <button class="layui-btn layui-btn-sm" lay-submit>查询</button>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; width: 96%; margin-top: 10px" >
+        <iframe id="iframe" class="con-iframe"  width="100%" height="500px" ></iframe>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    layui.use(['form'], function () {
+        var form = layui.form;
+
+        form.on('submit', function (data) {
+            var field = data.field;
+            var orderNumber = field.orderNumber;
+
+            console.log(orderNumber)
+
+            var url = "order_info.html?orderNumber=" + orderNumber;
+
+            $("#iframe").attr("src", url)
+        })
+
+    })
+
+</script>
+
+</body>
+</html>

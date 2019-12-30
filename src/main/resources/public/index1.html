@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+
+    <link rel="stylesheet" type="text/css" href="layui/css/layui.css">
+
+    <link href="index/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="index/css/style-responsive.css" rel="stylesheet" type="text/css" media="screen" />
+
+    <script src="layui/layui.js"></script>
+    <script src="js/common.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.7/vue.min.js"></script>
+</head>
+<body>
+<div id="app">
+<ul class="layui-nav" lay-filter="">
+    <li class="layui-nav-item">
+        维修
+    </li>
+    <li class="layui-nav-item" style="float: right; margin-right: 50px" @click="empLogin()">
+        <span>员工登录</span>
+    </li>
+    <li class="layui-nav-item" style="float: right; margin-right: 50px" @click="userLogin(1)">
+        <span>注册</span>
+    </li>
+    <li class="layui-nav-item" style="float: right; margin-right: 50px" @click="userLogin(0)">
+        <span>登录</span>
+    </li>
+
+</ul>
+
+<div class="layui-carousel" id="test1" style="margin: auto;">
+    <div  carousel-item >
+       <template v-for="i in 7">
+           <img :src="'images/' + (i + 1) + '.jpg'" style="width: 100%; height: 100%">
+       </template>
+    </div>
+</div>
+
+<div class="service_section">
+    <div class="container">
+
+        <h2>Take a look to see our services</h2>
+        <h4>One machine can do the work of fifty ordinary men. No machine can do the work of one extraordinary man</h4>
+
+        <div class="insider">
+
+            <div class="column" @click="apply">
+                <span class="fa fa-mobile">
+                    <i class="layui-icon " style="font-size: 30px">&#xe63c;</i>
+                </span>
+
+                <h3>订单填写</h3>
+                <p>From there to here, and here to there, funny things are everywhere.</p>
+            </div>
+
+            <div class="column" @click="search">
+                <span class="fa fa-comment-o">
+                    <i class="layui-icon " style="font-size: 30px">&#xe615;</i>
+                </span>
+                <h3>订单查询</h3>
+                <p>From there to here, and here to there, funny things are everywhere.</p>
+            </div>
+
+            <div class="column">
+                <span class="fa fa-heart-o">
+                    <i class="layui-icon " style="font-size: 30px">&#xe60c;</i>
+                </span>
+                <h3>其它功能</h3>
+                <p></p>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+</div>
+
+
+<script type="text/javascript">
+
+    var vue = new Vue({
+        el:"#app",
+        mounted(){
+            layui.use(['element', 'carousel', 'layer'], function(){
+                var element = layui.element;
+                var layer = layui.layer;
+                var carousel = layui.carousel;
+                //建造实例
+                carousel.render({
+                    elem: '#test1'
+                    ,width: '100%' //设置容器宽度
+                    ,height: '600px'
+                    ,arrow: 'always' //始终显示箭头
+                    //,anim: 'updown' //切换动画方式
+                    ,height: "400px"
+                });
+            });
+        },
+        methods:{
+            userLogin:function (value) {
+                window.location.href = "userLogin.html?type=" + value;
+            },
+
+            empLogin:function(){
+                window.location.href = "empLogin.html";
+            },
+
+            search:function () {
+                layer.open({
+                    type: 2,
+                    title: '订单详情',
+                    content: "order_search.html",
+                    maxmin: true,
+                    area: ['500px', '620px']
+                });
+            },
+
+            apply:function () {
+                layer.open({
+                    type: 2,
+                    title: '提交订单',
+                    content: "toForm/apply_order",
+                    maxmin: true,
+                    area: ['600px', '600px'],
+                    btn: ['确认', '取消'],
+                    yes: function(index, layero) {
+                        //点击确认触发 iframe 内容中的按钮提交
+                        var submit = layero.find('iframe').contents().find("#confirm");
+                        submit.click();
+                    }
+                });
+            }
+        }
+    })
+
+
+</script>
+
+</body>
+</html>

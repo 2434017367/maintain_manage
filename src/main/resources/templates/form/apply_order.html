@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <#include "/header.html">
+
+    <style>
+        .box{
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+        .line{
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-form box" id="app">
+
+    <div class="line">
+        <span style="width: 80px">姓名：</span>
+        <input type="text" name="name" v-model="user.name" class="layui-input" lay-verify="required" >
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">性别：</span>
+        <div>
+            <template v-if="user.sex == 0">
+                <input type="radio" name="sex" value="1" title="男" >
+                <input type="radio" name="sex" value="0" title="女" checked>
+            </template>
+            <template v-else>
+                <input type="radio" name="sex" value="1" title="男" checked>
+                <input type="radio" name="sex" value="0" title="女" >
+            </template>
+        </div>
+
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">电话：</span>
+        <input type="text" name="phone" v-model="user.phone" class="layui-input" lay-verify="phone" >
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">邮  箱：</span>
+        <input type="text" v-model="user.email" name="email" class="layui-input" lay-verify="email" >
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">验证码：</span>
+        <input type="text"  style="width: 200px"  name="vCode" class="layui-input" lay-verify="vCode">
+        <button class="layui-btn layui-btn-sm" style="margin-left: 10px; width: 100px" @click="getVCode" :class="{'layui-btn-disabled': time > 0}">{{time > 0 ? time : '获取验证码'}}</button>
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">地址：</span>
+        <input type="text" name="address" v-model="user.address" class="layui-input" lay-verify="required">
+    </div>
+
+    <div class="line">
+        <textarea name="content" class="layui-textarea" placeholder="请输入维修说明"></textarea>
+    </div>
+
+
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="confirm" id="confirm" value="确认">
+    </div>
+
+
+</div>
+
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#app",
+        data:{
+            user:{
+
+            },
+            time:0
+        },
+        created(){
+            if(parent.type === 1){
+                $.get("../api/user/getLoginUserInfo",function (r) {
+                    console.log(r)
+                    if(r.code === 0){
+
+                        vue.user = r.data;
+                    }
+                });
+            }
+
+        },
+        mounted() {
+            layui.use(['form'], function () {
+                var form = layui.form;
+
+                form.on('submit(confirm)', function (data) {
+                    var field = data.field;
+                    $.post("../api/apply/submitApplyPrivate", field, function (r) {
+                        if(r.code === 0){
+                            if(parent.type === 1){
+                                // 刷新列表
+                                parent.loadTable();
+                            }
+                            layer.msg("提交成功", {icon:1,time: 500}, function () {
+                                // 关闭当前窗体
+                                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                parent.layer.close(index); //再执行关闭
+                            });
+                        }else{
+                            layer.msg(r.msg, {icon:2,time: 500});
+                        }
+                    })
+                });
+
+                form.verify({
+                    // "zemail":function (value, item) {
+                    //     var s = isEmail(value);
+                    //     if(isNotBlank(s)){
+                    //         return s;
+                    //     }
+                    // },
+
+                    "vCode":function (value, item) {
+                        var s = isVCode(value);
+                        if(isNotBlank(s)){
+                            return s;
+                        }
+                    }
+
+                });
+            })
+        },
+
+        methods: {
+            getVCode:function () {
+                if(vue.time == 0){
+                    var s = isEmail(vue.user.email);
+                    if(isNotBlank(s)){
+                        layer.msg(s, {icon:2, time: 1000});
+                    }else{
+                        vue.time = 60;
+                        var timer = setInterval(function(){
+                            vue.time--;
+                            if( vue.time==0){
+                                clearInterval(timer);
+                            }
+                        },1000);
+                        $.get("../getVCode/" + vue.user.email, function (r) {
+                            if(r.code === 0){
+
+                            }else{
+                                layer.msg("获取验证码失败", {icon:2})
+                            }
+                        });
+                    }
+                }
+
+            }
+        }
+    })
+
+</script>
+
+</body>
+</html>

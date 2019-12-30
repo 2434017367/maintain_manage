@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <#include "/header.html">
+
+    <style>
+        .head_image{
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+            background-color: #00FFFF;
+            margin: 0 auto;
+        }
+
+        .info-box{
+            background-color: white;
+            min-height: 460px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px
+        }
+
+        .info{
+            width: 100%;
+        }
+
+        .info-text{
+            font-family: "Helvetica Neue";
+            font-size: 14px;
+            font-weight: 400;
+            color: rgb(26, 26, 26);
+            margin-top: 20px;
+        }
+
+        .info-table{
+            font-family: "Helvetica Neue";
+            font-size: 14px;
+            font-weight: bold;
+            color: #000000
+        }
+
+        .l-box{
+            background-color: white;
+            min-height: 500px
+        }
+    </style>
+</head>
+<body style="background-color: rgb(236, 239, 241)">
+
+<div id="app">
+
+    <ul class="layui-nav" >
+        <li class="layui-nav-item">
+            <!--<a href="">个人中心<span class="layui-badge-dot"></span></a>-->
+            欢迎{{user.name}}
+        </li>
+
+        <li class="layui-nav-item" style="float: right">
+            <a href="outLogin/user">退出登录</a>
+        </li>
+
+
+    </ul>
+
+    <div class="layui-container" style="margin-top: 50px" >
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md3" >
+                <div class="info-box">
+                    <div class="info">
+                        <div class="head_image">
+                            <img id="head_image" class="head_image" :src="'getImage/' + user.headImage">
+                        </div>
+                        <div class="info-text" style="margin-top: 30px">
+                            <span class="info-table">用户名：</span>{{user.username}}
+                        </div>
+                        <div class="info-text">
+                            <span class="info-table">姓名：</span>{{user.name}}
+                        </div>
+                        <div class="info-text">
+                            <span class="info-table">性别：</span>{{user.sex == 0 ? '女' : user.sex == 1 ? '男' : ''}}
+                        </div>
+                        <div class="info-text">
+                            <span class="info-table">电话：</span>{{user.phone}}
+                        </div>
+                        <div class="info-text" @click="updateEmail">
+                            <span class="info-table">邮箱：</span>{{user.email}}
+                        </div>
+                        <div class="info-text">
+                            <span class="info-table">地址：</span>{{user.address}}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: row; ">
+                        <button class="layui-btn" @click="updateInfo">修改资料</button>
+                        <button class="layui-btn" @click="updatePass">修改密码</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-md9" >
+                <div class="l-box">
+                    <div class="layui-card">
+                        <div class="layui-card-header">我的订单</div>
+                        <div class="layui-card-body" style="display: flex; flex-direction: column;">
+                            <div style="display: flex; flex-direction: row; justify-content: space-between" class="layui-form">
+                                <div style="display: flex; flex-direction: row;">
+                                    <input name="orderNumber" type="text" class="layui-input" style="width: 150px; margin-right: 10px" placeholder="请输入订单号">
+                                    <select name="status" style="width: 80px; ">
+                                        <option value="">请选择状态</option>
+                                        <option value="0">提单</option>
+                                        <option value="1">派单</option>
+                                        <option value="2">接单</option>
+                                        <option value="3">取消订单</option>
+                                        <option value="4">完成订单</option>
+                                    </select>
+                                </div>
+
+                                <div style="display: flex; flex-direction: row;">
+                                    <button lay-submit lay-filter="search" id="search" class="layui-btn">查询</button>
+                                    <button lay-submit lay-filter="add" class="layui-btn" style="margin-left: 10px">填写订单</button>
+                                </div>
+                            </div>
+
+                            <table id="demo" lay-filter="test"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/html" id="bar">
+    {{# if(d.status < 2){ }}
+        <button class="layui-btn layui-btn-normal layui-btn-xs" lay-event="cancel">取消订单</button>
+    {{# } }}
+</script>
+
+</body>
+
+<script>
+
+    var type = 1;
+
+    var vue = new Vue({
+        el: "#app",
+        data:{
+            layui:{
+                tableIns:null
+            },
+            user:{
+
+            }
+        },
+        created(){
+           this.getInfo();
+        },
+        mounted() {
+            //JavaScript代码区域
+            layui.use(['element', 'layer', 'table', 'form', 'upload'], function(){
+                var element = layui.element;
+                var form = layui.form;
+                var table = layui.table;
+                var upload = layui.upload;
+
+                //第一个实例
+                vue.layui.tableIns = table.render({
+                    elem: '#demo'
+                    ,height: 400
+                    ,url: 'api/user/queryOrder' //数据接口
+                    ,cols: [[ //表头
+                        {
+                            field: 'orderNumber',
+                            title: '单号',
+                            width: 130
+                        }
+                        ,{
+                            title: '称呼',
+                            width: 120,
+                            templet: function (d) {
+                                return d.name + (d.sex === 1 ? "先生" : "女生");
+                            }
+                        }
+                        ,{
+                            field: 'email',
+                            title: '邮箱',
+                            width: 120
+                        }
+                        ,{
+                            field: 'address',
+                            title: '地址',
+                            width: 100
+                        }
+                        ,{
+                            field: 'content',
+                            title: '内容',
+                        }
+                        ,{
+                            field: 'status',
+                            title: '状态',
+                            width: 100,
+                            templet: function (d) {
+                                var s;
+
+                                if(d.status === 0){
+                                    s = "提单";
+                                }else if(d.status === 1){
+                                    s = "派单";
+                                }else if(d.status === 2){
+                                    s = "接单";
+                                }else if(d.status === 3){
+                                    s = "取消";
+                                }else if(d.status === 4){
+                                    s = "完成";
+                                }
+
+                                return s;
+                            }
+                        }
+                        ,{
+                            title: '操作',
+                            width: 100,
+                            toolbar: '#bar'
+                        }
+
+                    ]]
+                    ,page: true //开启分页
+                    ,limit:10
+                    ,limits:[30,60,90]
+                    ,text: {
+                        none: '暂无相关数据' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+                    }
+                    ,skin:"line"
+                });
+
+                table.on('tool(test)', function (obj) {
+                    var data = obj.data; //获得当前行数据
+                    var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                    var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+                    if(layEvent === 'cancel') {
+                        // layer.msg("取消订单")
+
+                        var loadIndex = layer.load(1);
+                        $.post("api/apply/cancel/" + data.id, function (r) {
+                            layer.close(loadIndex);
+                            if (r.code === 0){
+                                $("#search").click();
+                                layer.msg("撤销成功", {icon:1, time:1000});
+                            } else{
+                                layer.msg(r.msg, {icon:2, time:1000});
+                            }
+                        })
+                    }
+                });
+
+                //双击
+                table.on('rowDouble(test)', function(obj){
+                    var data = obj.data;
+
+                    layer.open({
+                        type: 2,
+                        title: '订单详情',
+                        content: "order_info.html?orderNumber=" + data.orderNumber,
+                        maxmin: true,
+                        area: ['500px', '500px']
+                    });
+
+                });
+
+                form.on('submit(add)', function (data) {
+                    layer.open({
+                        type: 2,
+                        title: '提交订单',
+                        content: "toForm/apply_order",
+                        maxmin: true,
+                        area: ['600px', '600px'],
+                        btn: ['确认', '取消'],
+                        yes: function(index, layero) {
+                            //点击确认触发 iframe 内容中的按钮提交
+                            var submit = layero.find('iframe').contents().find("#confirm");
+                            submit.click();
+                        }
+                    });
+                });
+
+                form.on('submit(search)', function (data) {
+                    vue.layui.tableIns.reload({
+                        where:data.field,
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                    })
+                });
+
+                upload.render({
+                    elem: '#head_image'
+                    ,url: 'api/user/headImage/' + vue.user.id
+                    ,before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                        layer.load(); //上传loading
+                    }
+                    ,done: function(res, index, upload){
+                        console.log(res);
+                        layer.closeAll('loading'); //关闭loading
+                        vue.getInfo();
+                        layer.msg("保存成功", {icon: 1,time: 1000}, function () {
+                            // 关闭当前窗体
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            parent.layer.close(index); //再执行关闭
+                        });
+                    }
+                    ,error: function(index, upload){
+                        layer.closeAll('loading'); //关闭loading
+                        layer.msg("保存失败", {icon:2,time:1000})
+                    }
+                });
+            });
+        },
+
+        methods: {
+
+            getInfo:function(){
+                $.get("api/user/getLoginUserInfo",function (r) {
+                    console.log(r)
+                    if(r.code === 0){
+
+                        vue.user = r.data;
+                    }
+                });
+            },
+
+            updateInfo:function() {
+                layer.open({
+                    type: 2,
+                    title: '修改资料',
+                    content: "toForm/update_user",
+                    maxmin: true,
+                    area: ['400px', '500px'],
+                    btn: ['确认', '取消'],
+                    yes: function(index, layero) {
+                        //点击确认触发 iframe 内容中的按钮提交
+                        var submit = layero.find('iframe').contents().find("#confirm");
+                        submit.click();
+                    }
+                });
+            },
+
+            updateEmail:function() {
+                layer.open({
+                    type: 2,
+                    title: '修改邮箱',
+                    content: "toForm/update_email",
+                    maxmin: true,
+                    area: ['400px', '400px'],
+                    btn: ['确认', '取消'],
+                    yes: function(index, layero) {
+                        //点击确认触发 iframe 内容中的按钮提交
+                        var submit = layero.find('iframe').contents().find("#confirm");
+                        submit.click();
+                    }
+                });
+            },
+
+            updatePass:function() {
+                layer.open({
+                    type: 2,
+                    title: '修改密码',
+                    content: "toForm/update_password",
+                    maxmin: true,
+                    area: ['400px', '500px'],
+                    btn: ['确认', '取消'],
+                    yes: function(index, layero) {
+                        //点击确认触发 iframe 内容中的按钮提交
+                        var submit = layero.find('iframe').contents().find("#confirm");
+                        submit.click();
+                    }
+                });
+            }
+
+
+        }
+    });
+
+
+    function getInfo() {
+        vue.getInfo();
+    }
+
+    function loadTable() {
+
+        vue.layui.tableIns.reload({
+            page: {
+                curr: 1 //重新从第 1 页开始
+            }
+        })
+    }
+
+
+</script>
+</html>

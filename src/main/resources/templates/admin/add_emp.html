@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <#include "/header.html">
+
+    <style>
+        .box{
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+        .line{
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .head_image{
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-form box" id="app">
+
+    <div class="line" style="justify-content: center">
+        <img id="head_image"  :src="headImage(emp.headImage) ? emp.headImage : '../getImage/' + emp.headImage" class="head_image"></img>
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">姓名：</span>
+        <input type="text" v-model="emp.name" name="name" class="layui-input" lay-verify="required" lay-reqText="姓名不能为空">
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">工号：</span>
+        <input v-if="isSave" type="text" v-model="emp.workNumber" name="workNumber" class="layui-input" lay-verify="workNumber" >
+        <span v-else >{{emp.workNumber}}</span>
+        <!--<input v-show="!isSave" type="text" :value="emp.workNumber"  class="layui-input" readonly="readonly" >-->
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">电话：</span>
+        <input type="text" v-model="emp.phone" name="phone" class="layui-input" lay-verify="phone|required" lay-reqText="电话不能为空">
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">邮箱：</span>
+        <input type="text" v-model="emp.email" name="email" class="layui-input" lay-verify="email|required" lay-reqText="邮箱不能为空">
+    </div>
+
+    <div class="line">
+        <span style="width: 80px">密码：</span>
+        <input type="text" v-model="emp.password" name="password" class="layui-input" lay-verify="password" >
+    </div>
+
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="confirm" id="confirm" value="确认">
+        <button id="upload"></button>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    var id = "${id}";
+
+    var vue = new Vue({
+        el: "#app",
+        data:{
+            emp:{
+                id:null,
+                headImage:"",
+                name:null,
+                workNumber:null,
+                phone:null,
+                email:null,
+                password:null
+
+
+            },
+            isSave:true,
+            isHeadImage:false,
+            url: "../api/admin/addEmp"
+        },
+        created(){
+            if(id != "-100" && isNotBlank(id)){
+                // id不为空更新
+                this.isSave = false;
+                this.url = "../api/admin/updateEmp"
+                $.get("../api/admin/queryEmp/"+id, function (r) {
+                    if (r.code === 0){
+                        for(let key in vue.emp){
+                            vue.$set(vue.emp, key, r.data[key]);
+                        }
+                    }
+                })
+            }
+        },
+        mounted(){
+            this.layuiInit();
+        },
+        methods:{
+           headImage:function(value){
+               if(isBlank(value) || value.length > 1000){
+                   return true;
+               }else{
+                   return false;
+               }
+           },
+           layuiInit:function () {
+               layui.use(['form','upload'], function () {
+                   var form = layui.form;
+                   var upload = layui.upload;
+
+                   form.verify({
+                       "password":function (value, item) {
+                           var s = isPassword(value);
+                           if(isNotBlank(s)){
+                               return s;
+                           }
+                       },
+                       "workNumber":function (value, item) {
+                           var s = isWorkNumber(value);
+                           if(isNotBlank(s)){
+                               return s;
+                           }
+                       }
+                   });
+
+                   form.on("submit(confirm)", function (data) {
+                       var field = data.field;
+                       var loadIndex = layer.load(1);
+
+                       if(vue.isHeadImage){
+                           $("#upload").click();
+                       }else{
+                           $.post(vue.url, vue.emp, function (r) {
+                               layer.close(loadIndex);
+                               if (r.code === 0){
+                                   parent.loadTable();
+                                   layer.msg("保存成功", {icon: 1,time: 1000}, function () {
+                                       // 关闭当前窗体
+                                       var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                       parent.layer.close(index); //再执行关闭
+                                   });
+                               }else{
+                                   layer.msg(r.msg, {icon:2,time:1000})
+                               }
+                           });
+                       }
+
+
+                   });
+
+
+                   upload.render({
+                       elem: '#head_image'
+                       ,url: vue.url + "HeadImage"
+                       ,data:vue.emp
+                       ,auto: false //选择文件后不自动上传
+                       ,bindAction: '#upload' //指向一个按钮触发上传
+                       ,choose: function(obj){
+                           //将每次选择的文件追加到文件队列
+                           var files = obj.pushFile();
+
+                           vue.isHeadImage = true;
+
+                           //预读本地文件，如果是多文件，则会遍历。(不支持ie8/9)
+                           obj.preview(function(index, file, result){
+                               // console.log(index); //得到文件索引
+                               // console.log(file); //得到文件对象
+                               // console.log(result); //得到文件base64编码，比如图片
+
+                               //obj.resetFile(index, file, '123.jpg'); //重命名文件名，layui 2.3.0 开始新增
+
+                               //这里还可以做一些 append 文件列表 DOM 的操作
+
+                               //obj.upload(index, file); //对上传失败的单个文件重新上传，一般在某个事件中使用
+                               //delete files[index]; //删除列表中对应的文件，一般在某个事件中使用
+
+                               vue.emp.headImage = result;
+                           });
+                       }
+                       ,before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                           vue.emp.headImage = null;
+                           layer.load(); //上传loading
+                       }
+                       ,done: function(res, index, upload){
+                           layer.closeAll('loading'); //关闭loading
+                           parent.loadTable();
+                           layer.msg("保存成功", {icon: 1,time: 1000}, function () {
+                               // 关闭当前窗体
+                               var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                               parent.layer.close(index); //再执行关闭
+                           });
+                       }
+                       ,error: function(index, upload){
+                           layer.closeAll('loading'); //关闭loading
+                           layer.msg("保存失败", {icon:2,time:1000})
+                       }
+                   });
+
+               });
+
+
+           }
+        }
+    })
+
+</script>
+
+</body>
+</html>

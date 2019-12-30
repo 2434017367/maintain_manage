@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单详情</title>
+
+    <link rel="stylesheet" type="text/css" href="layui/css/layui.css">
+
+    <script src="layui/layui.js"></script>
+    <script src="js/common.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.7/vue.min.js"></script>
+
+    <style>
+        .line{
+            margin-top: 10px;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            font-size: 15px;
+        }
+        .line-l{
+            width: 50%;
+            text-align: justify;
+            text-justify: newspaper;
+            word-break: break-all;
+        }
+        .head_image{
+            width: 60px;
+            height: 60px;
+            border-radius: 100%;
+            background-color: #00FFFF;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="app">
+
+    <div class="layui-card" v-if="obj.orderNumber != null">
+        <!--<div class="layui-card-header">{{obj.status}}</div>-->
+        <div class="layui-card-body">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>订单信息</legend>
+                <div class="layui-field-box" style="display: flex; flex-direction: column">
+                    <div class="line">
+                        <div class="line-l">订单状态：{{obj.statusText}}</div>
+                        <div class="line-l">订单号：{{obj.orderNumber}}</div>
+                    </div>
+                    <div class="line">
+                        <div class="line-l">
+                            电话：{{obj.phone}}
+                        </div>
+                        <div class="line-l">
+                            邮箱：{{obj.email}}
+                        </div>
+                    </div>
+
+                    <div class="line">
+                        地址：{{obj.address}}
+                    </div>
+                    <div class="line">
+                        说明：{{obj.content}}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>维修员信息</legend>
+                <div class="layui-field-box" style="display: flex; flex-direction: column" v-if="obj.employees != null">
+                    <div class="line" style="align-items: baseline">
+                       <img class="head_image"  :src="'getImage/' + obj.employees.headImage">
+                        <span>姓名：{{obj.employees.name}}</span>
+                        <span style="margin-left: 10px">工号：{{obj.employees.workNumber}}</span>
+                    </div>
+                    <div class="line" style="margin-top: 20px">
+                        <div class="line-l">
+                            电话：{{obj.employees.phone}}
+                        </div>
+                        <div class="line-l">
+                            邮箱：{{obj.employees.email}}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div v-else class="layui-field-box">
+                    暂无维修人员信息
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div v-else style="width: 100%; height: 100%">
+        <span style="margin: 0 auto;">未查询到指定订单</span>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+    var orderNumber = url("orderNumber");
+
+    var vue = new Vue({
+        el:"#app",
+        data:{
+            obj:{
+
+            }
+        },
+        created(){
+            console.log(orderNumber)
+            if(isNotBlank(orderNumber)){
+                $.get("api/apply/getInfo/" + orderNumber, function (r) {
+                    if (r.code === 0){
+                        vue.obj = r.data;
+
+                        var s;
+                        if(vue.obj.status === 0){
+                            s = "提单";
+                        }else if(vue.obj.status === 1){
+                            s = "派单";
+                        }else if(vue.obj.status === 2){
+                            s = "接单";
+                        }else if(vue.obj.status === 3){
+                            s = "取消";
+                        }else if(vue.obj.status === 4){
+                            s = "完成";
+                        }
+
+                        vue.obj.statusText = s;
+                    }
+                })
+            }
+        },
+
+    })
+
+</script>
+
+</body>
+</html>
