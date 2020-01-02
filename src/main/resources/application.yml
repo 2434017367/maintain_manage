@@ -26,15 +26,37 @@ spring:
   devtools:
     restart:
       enabled: true #设置开启热部署
+#  mail:
+#    username: 2301380285@qq.com #发送者的账号和密码
+#    password: ukmtqhtnhgfrdhia #这个是qq邮箱中的动态安全密码
+#    host: smtp.qq.com #发送的服务器
+#    #配置和服务器的一个安全连接
+#    properties:
+#      mail:
+#        smtp:
+#
+#      mailsmtp:
+#        ssl:
+#          enable: true
+#    port: 465
   mail:
+    host: smtp.qq.com #发送的服务器
     username: 2301380285@qq.com #发送者的账号和密码
     password: ukmtqhtnhgfrdhia #这个是qq邮箱中的动态安全密码
-    host: smtp.qq.com #发送的服务器
-    #配置和服务器的一个安全连接
+    default-encoding: UTF-8
+    port: 465
+    auth: true
     properties:
-      mailsmtp:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+      imap:
         ssl:
-          enable: true
+          socketFactory:
+            fallback: false
+
+
 
 
 #mybatis
@@ -67,4 +89,4 @@ mybatis-plus:
 # 自定义配置
 config:
   imagePath: F://image/head/
-
+#  imagePath: /opt/cjl/image/

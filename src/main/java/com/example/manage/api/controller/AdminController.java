@@ -179,7 +179,7 @@ public class AdminController {
     public R addEmpHeadImage(@RequestParam("file") MultipartFile file, EmployeesEntity employees){
 
         // 判断工号是否已经存在
-        EmployeesEntity workNumber = employeesService.getOne(new QueryWrapper<EmployeesEntity>().eq("workNumber", employees.getWorkNumber()));
+        EmployeesEntity workNumber = employeesService.getOne(new QueryWrapper<EmployeesEntity>().eq("work_number", employees.getWorkNumber()));
 
         if (workNumber != null){
             return R.error("工号已经存在");
@@ -207,7 +207,7 @@ public class AdminController {
     public R addEmp(EmployeesEntity employees){
 
         // 判断工号是否已经存在
-        EmployeesEntity workNumber = employeesService.getOne(new QueryWrapper<EmployeesEntity>().eq("workNumber", employees.getWorkNumber()));
+        EmployeesEntity workNumber = employeesService.getOne(new QueryWrapper<EmployeesEntity>().eq("work_number", employees.getWorkNumber()));
 
         if (workNumber != null){
             return R.error("工号已经存在");

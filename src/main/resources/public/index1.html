@@ -34,8 +34,8 @@
 
 <div class="layui-carousel" id="test1" style="margin: auto;">
     <div  carousel-item >
-       <template v-for="i in 7">
-           <img :src="'images/' + (i + 1) + '.jpg'" style="width: 100%; height: 100%">
+       <template v-for="i in 3">
+           <img :src="'images/' + i + '.jpg'" style="width: 100%; height: 100%">
        </template>
     </div>
 </div>
@@ -43,8 +43,8 @@
 <div class="service_section">
     <div class="container">
 
-        <h2>Take a look to see our services</h2>
-        <h4>One machine can do the work of fifty ordinary men. No machine can do the work of one extraordinary man</h4>
+        <h2>简介</h2>
+        <h4>本站为校园网络维修服务站，致力于校内解决广大师生们的网络维修问题。如果您有需要，请联系我们！</h4>
 
         <div class="insider">
 
@@ -54,7 +54,7 @@
                 </span>
 
                 <h3>订单填写</h3>
-                <p>From there to here, and here to there, funny things are everywhere.</p>
+                <p>请填写您的详细信息，我们会根据情况进行派单！</p>
             </div>
 
             <div class="column" @click="search">
@@ -62,7 +62,7 @@
                     <i class="layui-icon " style="font-size: 30px">&#xe615;</i>
                 </span>
                 <h3>订单查询</h3>
-                <p>From there to here, and here to there, funny things are everywhere.</p>
+                <p>订单查询： 输入您的订单号，可以查询您下的订单！</p>
             </div>
 
             <div class="column">
@@ -70,7 +70,7 @@
                     <i class="layui-icon " style="font-size: 30px">&#xe60c;</i>
                 </span>
                 <h3>其它功能</h3>
-                <p></p>
+                <p>其他功能：敬请期待！</p>
             </div>
 
         </div>
@@ -95,7 +95,7 @@
                 carousel.render({
                     elem: '#test1'
                     ,width: '100%' //设置容器宽度
-                    ,height: '600px'
+                    ,height: '700px'
                     ,arrow: 'always' //始终显示箭头
                     //,anim: 'updown' //切换动画方式
                     ,height: "400px"

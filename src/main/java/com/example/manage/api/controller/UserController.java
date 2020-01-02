@@ -81,18 +81,22 @@ public class UserController {
 
         // 判读用户名是否存在
         if(userEntity == null){
-            userEntity = userService.getBaseMapper().selectOne(new QueryWrapper<UserEntity>()
-                    .eq("email", user.getEmail()));
 
-            // 判断邮箱是否存在
-            if(userEntity == null){
-                user.setCreateDate(new Date());
-                // 都不存在 执行注册
-                boolean insert = userService.save(user);
-                return insert ? R.ok() : R.error("注册失败");
-            }else{
-                return R.error("该邮箱已经存在");
-            }
+//            userEntity = userService.getBaseMapper().selectOne(new QueryWrapper<UserEntity>()
+//                    .eq("email", user.getEmail()));
+//
+//            // 判断邮箱是否存在
+//            if(userEntity == null){
+//                user.setCreateDate(new Date());
+//                // 都不存在 执行注册
+//                boolean insert = userService.save(user);
+//                return insert ? R.ok() : R.error("注册失败");
+//            }else{
+//                return R.error("该邮箱已经存在");
+//            }
+
+            boolean insert = userService.save(user);
+            return insert ? R.ok() : R.error("注册失败");
         }else {
             return R.error("该用户名已经存在");
         }
