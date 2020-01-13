@@ -13,8 +13,8 @@ import javax.servlet.http.HttpSession;
 /**
  *
  * 登录拦截器
- * @email 2434017367@qq.com
- * @author: zhy
+ *
+ * @author: cjl
  * @date: 2019/12/17
  * @time: 10:15
  */

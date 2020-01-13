@@ -88,5 +88,5 @@ mybatis-plus:
 
 # 自定义配置
 config:
-  imagePath: F://image/head/
-#  imagePath: /opt/cjl/image/
+#  imagePath: F://image/head/
+  imagePath: /opt/cjl/image/

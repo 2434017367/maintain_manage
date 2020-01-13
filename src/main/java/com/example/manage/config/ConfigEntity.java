@@ -5,8 +5,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @email 2434017367@qq.com
- * @author: zhy
+ *
+ * @author: cjl
  * @date: 2019/12/16
  * @time: 11:20
  */

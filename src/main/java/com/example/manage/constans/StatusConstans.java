@@ -1,7 +1,7 @@
 package com.example.manage.constans;
 
 /**
- * @email 2434017367@qq.com
+ *
  * @author: gyh
  * @date: 2019/9/29
  * @time: 15:36
